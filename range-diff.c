@@ -217,8 +217,8 @@ static void find_exact_matches(struct string_list *a, struct string_list *b)
 		util->i = i;
 		util->patch = a->items[i].string;
 		util->diff = util->patch + util->diff_offset;
-		hashmap_entry_init(util, strhash(util->diff));
-		hashmap_add(&map, util);
+		hashmap_entry_init(&util->e, strhash(util->diff));
+		hashmap_add(&map, &util->e);
 	}
 
 	/* Now try to find exact matches in b */
@@ -228,8 +228,8 @@ static void find_exact_matches(struct string_list *a, struct string_list *b)
 		util->i = i;
 		util->patch = b->items[i].string;
 		util->diff = util->patch + util->diff_offset;
-		hashmap_entry_init(util, strhash(util->diff));
-		other = hashmap_remove(&map, util, NULL);
+		hashmap_entry_init(&util->e, strhash(util->diff));
+		other = hashmap_remove_entry(&map, util, e, NULL);
 		if (other) {
 			if (other->matching >= 0)
 				BUG("already assigned!");
@@ -239,7 +239,7 @@ static void find_exact_matches(struct string_list *a, struct string_list *b)
 		}
 	}
 
-	hashmap_free(&map, 0);
+	hashmap_free(&map);
 }
 
 static void diffsize_consume(void *data, char *line, unsigned long len)
